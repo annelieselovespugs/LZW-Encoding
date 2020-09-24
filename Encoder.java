@@ -1,3 +1,7 @@
+//Original code by Jasmine and Sally
+//Decoder by Akseli and Lyon
+//Optimization by Anneliese and Maya :)
+
 //import all required tools
 import java.io.*;
 import java.util.*;
@@ -35,7 +39,6 @@ public class Encoder {
 				//print out value for previous character
 				else
 				{
-
 					//if p is already in the ascii table
 					if (p.length()==1)
 					{
@@ -46,9 +49,12 @@ public class Encoder {
 					{
 						pw.print(256+dictionary.indexOf(p) + " ");
 					}
-					if (dictionary.size()<=1000)
+					if (dictionary.size()<512) //Changed --> 512 is the maximum
 					{
 						dictionary.add(pc);
+					}
+					else{
+						System.out.println ("Dictionary is full. :( File will probably not encode or decode correctly. This will not work.");
 					}
 					p= "" + c;
 				}
@@ -99,7 +105,7 @@ public class Encoder {
 			BufferedReader br = new BufferedReader(fr);
 
 			// PrintWriter for New Decoded Text File
-			PrintWriter pw = new PrintWriter ( "decoded.txt ");
+			PrintWriter pw = new PrintWriter ( "decoded.txt");
 			
 			// Int a (just to store each character being read in)
 			int a;
@@ -154,13 +160,13 @@ public class Encoder {
 					else
 					{
 						// If Statement for Delimiter ":", which represents the end of the index of the dictionary entry and the start of its length
-						if ( String.valueOf ( ( char ) a ).equals ( ":" ) )
+						if ((char)a == ':')
 						{
 							thisCode = Integer.parseInt(currentString);
 							currentString = "";
 						}
 						// If Statement for Delimiter "-", which indicates the end of the length of the dictionary entry and the start of the actual character combination
-						else if (String.valueOf ( ( char ) a ).equals ( "-" ) )
+						else if ((char)a == '-')
 						{
 							//parse the length of the entry to an int
 							codeLength = Integer.parseInt(currentString);
@@ -177,7 +183,7 @@ public class Encoder {
 					}
 				}
 				// If a = x, Then We Found X
-				else if ( String.valueOf ( ( char ) a ).equals ( "x" ) )
+				else if ((char)a == 'x')
 				{
 					//set foundX to true
 					foundX = true;
@@ -208,7 +214,7 @@ public class Encoder {
 			int b;
 			
 			// While b != "x" and the end of the file hasn't been reached
-			while ( ( b = bf.read() ) != -1 && String.valueOf ( (char ) b ).equals ( "x" ) == false )
+			while (((b = bf.read()) != -1) && ((char)b != 'x'))
 			{
 				// thisCharacter Becomes the current character
 				thisCharacter = String.valueOf ( ( char ) b );
@@ -242,11 +248,7 @@ public class Encoder {
 			}
 			
 			// Print Decoded Message to File
-			for ( int counter = 0; counter < decodedMessage.length (); counter++ )
-			{
-				pw.print ( decodedMessage.charAt ( counter ) );
-			}
-			
+			pw.print(decodedMessage);
 			// close the print writer
 			pw.close();
 		}
