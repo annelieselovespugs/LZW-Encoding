@@ -14,6 +14,8 @@ public class Encoder {
 	private char c = 0;
 	private String pc = "";
 
+	private boolean dictionaryFull = false; //this is a boolean that we can use to prevent the program from throwing the full dictionary error more than once
+
 	public Encoder ()
 	{
 	}
@@ -26,6 +28,7 @@ public class Encoder {
 			FileReader fr = new FileReader (fileName);
 			BufferedReader br = new BufferedReader(fr);
 			PrintWriter pw = new PrintWriter ("encoded.txt");
+			String encodedContent = ""; //large string holding everything before printed
 			while (br.ready())
 			{
 				c = (char)br.read();
@@ -42,18 +45,19 @@ public class Encoder {
 					//if p is already in the ascii table
 					if (p.length()==1)
 					{
-						pw.print((int)p.charAt(0) + " ");
+						encodedContent += ((int)p.charAt(0) + " ");
 					}
 					//if only in dictionary
 					else 
 					{
-						pw.print(256+dictionary.indexOf(p) + " ");
+						encodedContent += (256+dictionary.indexOf(p) + " ");
 					}
 					if (dictionary.size()<512) //Changed --> 512 is the maximum
 					{
 						dictionary.add(pc);
 					}
-					else{
+					else if (dictionaryFull == false){
+						dictionaryFull = true;
 						System.out.println ("Dictionary is full. :( File will probably not encode or decode correctly. This will not work.");
 					}
 					p= "" + c;
@@ -64,21 +68,32 @@ public class Encoder {
 			//if previous is just one character then convert it to an int
 			if (p.length() == 1 )
 			{
-				pw.print((int)p.charAt(0)+ " ");
+				encodedContent += ((int)p.charAt(0)+ " ");
 			}
 			//if previous is a longer String, then find it in the dictionary
 			else
 			{
-				pw.print(256+dictionary.indexOf(p) + " ");
+				encodedContent += (256+dictionary.indexOf(p) + " ");
 			}
 			// Include the dictionary at the end of the encoded file
-			// Print an x to represent the end of the code and the start of the dictionary
-			pw.print("x");
+			// Print an Ŕ to represent the end of the code and the start of the dictionary
+			encodedContent += ('Ŕ');
 			// print each the index of each dictionary entry, then the length of the entry so when reading it in, it is easy to know when to stop, then print the entry itself
 			// these are delimited by a ":" between the index and the length and a "-" between the length and the entry itself
 			for (int i = 0; i < dictionary.size(); i++) {
-				pw.print("" + (i + 256) + ":" + dictionary.get(i).length() + "-" + dictionary.get(i));
+				encodedContent += ("" + (i + 256) + ":" + dictionary.get(i).length() + "-" + dictionary.get(i));
 			}
+
+			//actually printing stuff
+			//print dictionary first
+			pw.print(encodedContent.substring((encodedContent.indexOf('Ŕ')+1), encodedContent.length()));
+
+			//print an Ŕ to separate the dictionary from the encoded message
+			pw.print((char)('Ŕ'));
+
+			//then print the rest of the stuff
+			pw.print(encodedContent.substring(0, (encodedContent.indexOf('Ŕ'))));
+
 			//close all writers and readers
 			pw.close();
 			br.close();
@@ -86,9 +101,13 @@ public class Encoder {
 		}
 		catch (IOException e)
 		{
-			System.out.println ("can't read");
+			System.out.println ("IOException.");
 		}
 	}
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 	public void decode () throws IOException
 	{
@@ -110,14 +129,14 @@ public class Encoder {
 			// Int a (just to store each character being read in)
 			int a;
 			
-			// Boolean for whether or not the Letter X has been read in yet, which indicates the start of the dictionary
-			boolean foundX = false;
+			// Boolean for whether or not the Letter Ŕ has been read in yet, which indicates the start of the dictionary
+			boolean foundR = false;
 			
 			// String for the Current String being constructed
 			String currentString = "";
 			
 			// HashMap for reconstructed Dictionary
-			HashMap < Integer, String > map = new HashMap < Integer, String > ();
+			HashMap <Integer, String> map = new HashMap < Integer, String > ();
 			
 			// Int for the Current Code
 			int thisCode = 0;
@@ -131,24 +150,30 @@ public class Encoder {
 			// Boolean for Reading (whether or not the characters currently being read are part of a combination of characters that is stored in the dictionary)
 			boolean startedReading = false;
 			
-			// While There Is a Char in the Buffered Reader
-			while ( ( a = br.read () ) != -1 )
+			// If the letter Ŕ has not been found yet
+			while (((a = br.read()) != -1) && (foundR == false))
 			{
-				// If the letter X has been found yet
-				if ( foundX == true )
+				// If a = Ŕ, set foundR to true
+				if ((char)a == ('Ŕ'))
+				{
+					//set foundR to true
+					foundR = true;
+				}
+
+				else if (foundR == false)
 				{
 					// If We Have Started Reading a combination that is in the dictionary
-					if ( startedReading == true )
+					if (startedReading == true)
 					{
 						// Add the Char Version of the Letter from the Buffered Reader to the current String that is being constructed
-						currentString += ( ( char ) a );
+						currentString += ((char) a);
 						// counter for the length of the String constructed so far Increases by One
 						lengthCounter++;
 						//if the current String has hit the specified length of the dictionary entry
-						if ( lengthCounter == codeLength )
+						if (lengthCounter == codeLength)
 						{
 							// Add to Dictionary
-							map.put ( thisCode, currentString );
+							map.put (thisCode, currentString);
 							// Reset currentString
 							currentString = "";
 							// Reset lengthCounter
@@ -178,29 +203,15 @@ public class Encoder {
 						else
 						{
 							//append the current character to currentString
-							currentString += ( ( char ) a );
+							currentString += ((char)a);
 						}
 					}
 				}
-				// If a = x, Then We Found X
-				else if ((char)a == 'x')
-				{
-					//set foundX to true
-					foundX = true;
-				}
 			}
 
-			//close the file reader and the buffered reader
-			fr.close();
-			br.close();
+			
 			
 			// Now that the dictionary is fully reconstructed, the file is read again to translate the encoded section
-			// File Reader for Encoded Text
-			FileReader f = new FileReader("encoded.txt");
-
-			// Buffered Reader for File
-			BufferedReader bf = new BufferedReader(f);
-			
 			// String Character to store the current character
 			String thisCharacter = "";
 			
@@ -210,23 +221,20 @@ public class Encoder {
 			// int to store the currentCode after it is parsed to an integer
 			int code = 0;
 			
-			// String for the Buffered Reader
-			int b;
-			
-			// While b != "x" and the end of the file hasn't been reached
-			while (((b = bf.read()) != -1) && ((char)b != 'x'))
+			// While the end of the file hasn't been reached
+			while ((a != -1))
 			{
 				// thisCharacter Becomes the current character
-				thisCharacter = String.valueOf ( ( char ) b );
+				thisCharacter = String.valueOf ((char)a);
 				
 				// If Statement for Delimiter " ", which indicates the end of the current code
-				if (thisCharacter.equals ( " " ) )
+				if (thisCharacter.equals (" "))
 				{
 					// parse the current code to an integer 
 					code = Integer.parseInt(currentCode);
 					
 					// If the code represents a single ASCII character
-					if ( code <= 255  )
+					if (code <= 255)
 					{
 						// the character is added to the message
 						decodedMessage += (char)code;
@@ -245,12 +253,17 @@ public class Encoder {
 					// Add Character to Current Code
 					currentCode += thisCharacter;
 				}
+				a = br.read();
 			}
 			
 			// Print Decoded Message to File
 			pw.print(decodedMessage);
 			// close the print writer
 			pw.close();
+
+			//close the file reader and the buffered reader
+			fr.close();
+			br.close();
 		}
 		
 		// Catch for Errors
