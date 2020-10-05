@@ -1,3 +1,7 @@
+/*
+* Praise be to Ms. Kaufman and Computer Science A teachers.
+* They spoke the truth when they spoke of handwritten code and BlueJ. */
+
 import java.io.IOException;
 
 public class LZWTester {
