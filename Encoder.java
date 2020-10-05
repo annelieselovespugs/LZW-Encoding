@@ -1,6 +1,9 @@
-//Original code by Jasmine and Sally
-//Decoder by Akseli and Lyon
-//Optimization by Anneliese and Maya :)
+/*
+* Praise be to Ms. Kaufman and Computer Science readCharacter teachers.
+* They spoke the truth when they spoke of handwritten code and BlueJ. 
+* Encoder by Jasmine and Sally
+* Decoder by Akseli and Lyon
+* Optimization by Anneliese and Maya*/
 
 //import all required tools
 import java.io.*;
@@ -10,77 +13,70 @@ public class Encoder {
 	
 	//initialize dictionary and previous, current, and previous + current variables
 	private ArrayList <String> dictionary = new ArrayList <String> (); 
-	private String p = "";
-	private char c = 0;
-	private String pc = "";
+	private String previousCharacter = "";
+	private char currentCharacter = 0;
+	private String previousPlusCurrentCharacter = "";
 
-	private boolean dictionaryFull = false; //this is a boolean that we can use to prevent the program from throwing the full dictionary error more than once
+	private boolean dictionaryFull = false; //this is readCharacter boolean that we can use to prevent the program from throwing the full dictionary error more than once
 
-	public Encoder ()
-	{
+	public Encoder(){
 	}
 
-
-	public void encode (String fileName) throws IOException
-	{
+	/*
+	* Encodes a .txt file given by the String input
+	* Outputs a .txt file of the dictionary and encoded text*/
+	public void encode(String fileName) throws IOException{
 		try {
-			//reading in a text file and creating print writer
+			//reading in readCharacter text file and creating print writer
 			FileReader fr = new FileReader (fileName);
 			BufferedReader br = new BufferedReader(fr);
 			PrintWriter pw = new PrintWriter ("encoded.txt");
 			String encodedContent = ""; //large string holding everything before printed
-			while (br.ready())
-			{
-				c = (char)br.read();
-				pc = p+c;
+			while (br.ready()){
+				currentCharacter = (char)br.read();
+				previousPlusCurrentCharacter = previousCharacter+currentCharacter;
 				//dictionary excludes characters 0-255 in the ascii table
-				//if pc is already in the dictionary or if it's in the ascii table
-				if (dictionary.indexOf(pc) >= 0 || pc.length() == 1)
-				{
-					p = pc;
+				//if previousPlusCurrentCharacter is already in the dictionary or if it's in the ascii table
+				if (dictionary.indexOf(previousPlusCurrentCharacter) >= 0 || previousPlusCurrentCharacter.length() == 1){
+					previousCharacter = previousPlusCurrentCharacter;
 				}
 				//print out value for previous character
-				else
-				{
-					//if p is already in the ascii table
-					if (p.length()==1)
-					{
-						encodedContent += ((int)p.charAt(0) + " ");
+				else{
+					//if previousCharacter is already in the ascii table
+					if (previousCharacter.length()==1){
+						encodedContent += ((int)previousCharacter.charAt(0) + " ");
 					}
 					//if only in dictionary
-					else 
-					{
-						encodedContent += (256+dictionary.indexOf(p) + " ");
+					else{
+						encodedContent += (256+dictionary.indexOf(previousCharacter) + " ");
 					}
-					if (dictionary.size()<512) //Changed --> 512 is the maximum
-					{
-						dictionary.add(pc);
+					//Changed --> 512 is the maximum
+					if (dictionary.size()<512){
+						dictionary.add(previousPlusCurrentCharacter);
 					}
 					else if (dictionaryFull == false){
 						dictionaryFull = true;
 						System.out.println ("Dictionary is full. :( File will probably not encode or decode correctly. This will not work.");
 					}
-					p= "" + c;
+					previousCharacter= "" + currentCharacter;
 				}
 
 			}
 			//edge case
 			//if previous is just one character then convert it to an int
-			if (p.length() == 1 )
-			{
-				encodedContent += ((int)p.charAt(0)+ " ");
+			if (previousCharacter.length() == 1 ){
+				encodedContent += ((int)previousCharacter.charAt(0)+ " ");
 			}
-			//if previous is a longer String, then find it in the dictionary
-			else
-			{
-				encodedContent += (256+dictionary.indexOf(p) + " ");
+			//if previous is readCharacter longer String, then find it in the dictionary
+			else{
+				encodedContent += (256+dictionary.indexOf(previousCharacter) + " ");
 			}
 			// Include the dictionary at the end of the encoded file
 			// Print an Ŕ to represent the end of the code and the start of the dictionary
 			encodedContent += ('Ŕ');
 			// print each the index of each dictionary entry, then the length of the entry so when reading it in, it is easy to know when to stop, then print the entry itself
-			// these are delimited by a ":" between the index and the length and a "-" between the length and the entry itself
-			for (int i = 0; i < dictionary.size(); i++) {
+			// these are delimited by readCharacter ":" between the index and the length and readCharacter "-" between the length and the entry itself
+			for (int i = 0; i < dictionary.size(); i++){
 				encodedContent += ("" + (i + 256) + ":" + dictionary.get(i).length() + "-" + dictionary.get(i));
 			}
 
@@ -99,21 +95,17 @@ public class Encoder {
 			br.close();
 			fr.close();
 		}
-		catch (IOException e)
-		{
+		catch (IOException e){
 			System.out.println ("IOException.");
 		}
 	}
-
-
-	////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-	public void decode () throws IOException
-	{
+	
+	/*
+	* Decodes a .txt file given by the String input
+	* Outputs a .txt file of the decoded file*/
+	public void decode() throws IOException{
 		// New String for Message
-		String decodedMessage = "";
-				
+		String decodedMessage = "";			
 		try
 		{
 			// First, the dictionary alone is read from the encoded file
@@ -126,8 +118,8 @@ public class Encoder {
 			// PrintWriter for New Decoded Text File
 			PrintWriter pw = new PrintWriter ( "decoded.txt");
 			
-			// Int a (just to store each character being read in)
-			int a;
+			// Int readCharacter (just to store each character being read in)
+			int readCharacter;
 			
 			// Boolean for whether or not the Letter Ŕ has been read in yet, which indicates the start of the dictionary
 			boolean foundR = false;
@@ -147,31 +139,25 @@ public class Encoder {
 			// Int for Current Length (stores the correct length of each dictionary entry)
 			int codeLength = 0;
 			
-			// Boolean for Reading (whether or not the characters currently being read are part of a combination of characters that is stored in the dictionary)
+			// Boolean for Reading (whether or not the characters currently being read are part of readCharacter combination of characters that is stored in the dictionary)
 			boolean startedReading = false;
 			
 			// If the letter Ŕ has not been found yet
-			while (((a = br.read()) != -1) && (foundR == false))
-			{
-				// If a = Ŕ, set foundR to true
-				if ((char)a == ('Ŕ'))
-				{
+			while (((readCharacter = br.read()) != -1) && (foundR == false)){
+				// If readCharacter = Ŕ, set foundR to true
+				if ((char)readCharacter == ('Ŕ')){
 					//set foundR to true
 					foundR = true;
 				}
-
-				else if (foundR == false)
-				{
-					// If We Have Started Reading a combination that is in the dictionary
-					if (startedReading == true)
-					{
+				else if (foundR == false){
+					// If We Have Started Reading readCharacter combination that is in the dictionary
+					if (startedReading == true){
 						// Add the Char Version of the Letter from the Buffered Reader to the current String that is being constructed
-						currentString += ((char) a);
+						currentString += ((char) readCharacter);
 						// counter for the length of the String constructed so far Increases by One
 						lengthCounter++;
 						//if the current String has hit the specified length of the dictionary entry
-						if (lengthCounter == codeLength)
-						{
+						if (lengthCounter == codeLength){
 							// Add to Dictionary
 							map.put (thisCode, currentString);
 							// Reset currentString
@@ -182,17 +168,14 @@ public class Encoder {
 							startedReading = false;
 						}
 					}
-					else
-					{
+					else{
 						// If Statement for Delimiter ":", which represents the end of the index of the dictionary entry and the start of its length
-						if ((char)a == ':')
-						{
+						if ((char)readCharacter == ':'){
 							thisCode = Integer.parseInt(currentString);
 							currentString = "";
 						}
 						// If Statement for Delimiter "-", which indicates the end of the length of the dictionary entry and the start of the actual character combination
-						else if ((char)a == '-')
-						{
+						else if ((char)readCharacter == '-'){
 							//parse the length of the entry to an int
 							codeLength = Integer.parseInt(currentString);
 							//set startedReading to true
@@ -200,16 +183,14 @@ public class Encoder {
 							//reset currentString
 							currentString = "";
 						}
-						else
-						{
+						else{
 							//append the current character to currentString
-							currentString += ((char)a);
+							currentString += ((char)readCharacter);
 						}
 					}
 				}
 			}
 
-			
 			
 			// Now that the dictionary is fully reconstructed, the file is read again to translate the encoded section
 			// String Character to store the current character
@@ -222,38 +203,34 @@ public class Encoder {
 			int code = 0;
 			
 			// While the end of the file hasn't been reached
-			while ((a != -1))
-			{
+			while ((readCharacter != -1)){
 				// thisCharacter Becomes the current character
-				thisCharacter = String.valueOf ((char)a);
+				thisCharacter = String.valueOf ((char)readCharacter);
 				
 				// If Statement for Delimiter " ", which indicates the end of the current code
-				if (thisCharacter.equals (" "))
-				{
+				if (thisCharacter.equals (" ")){
 					// parse the current code to an integer 
 					code = Integer.parseInt(currentCode);
 					
-					// If the code represents a single ASCII character
-					if (code <= 255)
-					{
+					// If the code represents readCharacter single ASCII character
+					if (code <= 255){
 						// the character is added to the message
 						decodedMessage += (char)code;
 					}
-					else
-					// If the code does not represent a single character, Use Dictionary We Created to find its value
-					{
+					// If the code does not represent readCharacter single character, Use Dictionary We Created to find its value
+
+					else{
 						// add the decoded combination to the decoded message
 						decodedMessage += map.get(code);	
 					}
 					//reset the currentCode after each individual code has been decoded
 					currentCode = "";
 				}
-				else
-				{
+				else{
 					// Add Character to Current Code
 					currentCode += thisCharacter;
 				}
-				a = br.read();
+				readCharacter = br.read();
 			}
 			
 			// Print Decoded Message to File
@@ -267,9 +244,24 @@ public class Encoder {
 		}
 		
 		// Catch for Errors
-		catch (Exception e)
-		{
+		catch (Exception e){
 			System.out.println(e);
 		}
 	}
+	
+	
 }
+
+/*
+ *          ,   ,
+ *          \\  \\
+ *          ) \\ \\    I--
+ *          )  )) ))  / * \
+ *          \  || || / /^="
+ * ,__      _\ \\ --/ /
+ * <  \\___/         '
+ *     '===\    ___, )
+ *          \  )___/\\
+ *          / /      '"
+ *          \ \
+ *           '"*/
