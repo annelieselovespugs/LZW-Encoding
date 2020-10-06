@@ -1,5 +1,5 @@
 /*
-* Praise be to Ms. Kaufman and Computer Science readCharacter teachers.
+* Praise be to Ms. Kaufman and Computer Science A teachers.
 * They spoke the truth when they spoke of handwritten code and BlueJ. 
 * Encoder by Jasmine and Sally
 * Decoder by Akseli and Lyon
@@ -17,7 +17,7 @@ public class Encoder {
 	private char currentCharacter = 0;
 	private String previousPlusCurrentCharacter = "";
 
-	private boolean dictionaryFull = false; //this is readCharacter boolean that we can use to prevent the program from throwing the full dictionary error more than once
+	private boolean dictionaryFull = false; //this is a boolean that we can use to prevent the program from throwing the full dictionary error more than once
 
 	public Encoder(){
 	}
@@ -27,7 +27,7 @@ public class Encoder {
 	* Outputs a .txt file of the dictionary and encoded text*/
 	public void encode(String fileName) throws IOException{
 		try {
-			//reading in readCharacter text file and creating print writer
+			//reading in a text file and creating print writer
 			FileReader fr = new FileReader (fileName);
 			BufferedReader br = new BufferedReader(fr);
 			PrintWriter pw = new PrintWriter ("encoded.txt");
@@ -67,7 +67,7 @@ public class Encoder {
 			if (previousCharacter.length() == 1 ){
 				encodedContent += ((int)previousCharacter.charAt(0)+ " ");
 			}
-			//if previous is readCharacter longer String, then find it in the dictionary
+			//if previous is a longer String, then find it in the dictionary
 			else{
 				encodedContent += (256+dictionary.indexOf(previousCharacter) + " ");
 			}
@@ -75,7 +75,7 @@ public class Encoder {
 			// Print an Ŕ to represent the end of the code and the start of the dictionary
 			encodedContent += ('Ŕ');
 			// print each the index of each dictionary entry, then the length of the entry so when reading it in, it is easy to know when to stop, then print the entry itself
-			// these are delimited by readCharacter ":" between the index and the length and readCharacter "-" between the length and the entry itself
+			// these are delimited by a ":" between the index and the length and a "-" between the length and the entry itself
 			for (int i = 0; i < dictionary.size(); i++){
 				encodedContent += ("" + (i + 256) + ":" + dictionary.get(i).length() + "-" + dictionary.get(i));
 			}
@@ -139,7 +139,7 @@ public class Encoder {
 			// Int for Current Length (stores the correct length of each dictionary entry)
 			int codeLength = 0;
 			
-			// Boolean for Reading (whether or not the characters currently being read are part of readCharacter combination of characters that is stored in the dictionary)
+			// Boolean for Reading (whether or not the characters currently being read are part of a combination of characters that is stored in the dictionary)
 			boolean startedReading = false;
 			
 			// If the letter Ŕ has not been found yet
@@ -150,7 +150,7 @@ public class Encoder {
 					foundR = true;
 				}
 				else if (foundR == false){
-					// If We Have Started Reading readCharacter combination that is in the dictionary
+					// If We Have Started Reading a combination that is in the dictionary
 					if (startedReading == true){
 						// Add the Char Version of the Letter from the Buffered Reader to the current String that is being constructed
 						currentString += ((char) readCharacter);
@@ -212,12 +212,12 @@ public class Encoder {
 					// parse the current code to an integer 
 					code = Integer.parseInt(currentCode);
 					
-					// If the code represents readCharacter single ASCII character
+					// If the code represents a single ASCII character
 					if (code <= 255){
 						// the character is added to the message
 						decodedMessage += (char)code;
 					}
-					// If the code does not represent readCharacter single character, Use Dictionary We Created to find its value
+					// If the code does not represent a single character, Use Dictionary We Created to find its value
 
 					else{
 						// add the decoded combination to the decoded message
@@ -264,4 +264,14 @@ public class Encoder {
  *          \  )___/\\
  *          / /      '"
  *          \ \
- *           '"*/
+ *           '"
+ *
+ *
+ *	O———              ————O
+ 		|————————————|
+ *		| ò       ó  |
+ 		|     O      |        < "Ogres are like onions."
+ *		|    ___     |
+ * 		|   /   \    |
+ * 	    \____________/
+ */
